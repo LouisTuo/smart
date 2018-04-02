@@ -7,8 +7,6 @@ import javax.jms.TextMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import com.smart.sso.rpc.AuthenticationRpcService;
 
@@ -21,10 +19,8 @@ public class PermissionJmsListener implements MessageListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PermissionJmsListener.class);
 
-	@Value("${sso.app.code}")
 	private String ssoAppCode;
 	
-	@Autowired
 	private AuthenticationRpcService authenticationRpcService;
 	
 	@Override
@@ -43,8 +39,16 @@ public class PermissionJmsListener implements MessageListener {
 			// 2.清除已获取最新权限的token集合(Session级别)
 			PermissionJmsMonitor.tokenSet.clear();
 			// 3.更新应用权限（Application级别）
-			ApplicationPermissionUtils.initApplicationPermissions(authenticationRpcService, ssoAppCode);
+			ApplicationPermission.initApplicationPermissions(authenticationRpcService, ssoAppCode);
 			LOGGER.info("成功通知appCode为：{}的应用更新权限！", appCode);
 		}
+	}
+
+	public void setSsoAppCode(String ssoAppCode) {
+		this.ssoAppCode = ssoAppCode;
+	}
+
+	public void setAuthenticationRpcService(AuthenticationRpcService authenticationRpcService) {
+		this.authenticationRpcService = authenticationRpcService;
 	}
 }

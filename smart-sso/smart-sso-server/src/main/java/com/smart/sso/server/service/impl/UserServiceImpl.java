@@ -1,15 +1,14 @@
 package com.smart.sso.server.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import com.smart.mvc.enums.TrueFalseEnum;
 import com.smart.mvc.model.Pagination;
@@ -19,6 +18,7 @@ import com.smart.mvc.provider.PasswordProvider;
 import com.smart.mvc.service.mybatis.impl.ServiceImpl;
 import com.smart.sso.server.dao.UserDao;
 import com.smart.sso.server.model.User;
+import com.smart.sso.server.model.UserApp;
 import com.smart.sso.server.service.AppService;
 import com.smart.sso.server.service.UserAppService;
 import com.smart.sso.server.service.UserRoleService;
@@ -39,7 +39,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> impleme
 		this.dao = dao;
 	}
 	
-	public Result login(String ip, String appCode, String account, String password) {
+	public Result login(String ip, String account, String password) {
 		Result result = Result.createSuccessResult();
 		User user = findByAccount(account);
 		if (user == null) {
@@ -52,20 +52,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> impleme
 			result.setCode(ResultCode.ERROR).setMessage("已被管理员禁用");
 		}
 		else {
-			Set<String> set = appService.findAppCodeByUserId(TrueFalseEnum.TRUE.getValue(), user.getId());
-			if (CollectionUtils.isEmpty(set)) {
-				result.setCode(ResultCode.ERROR).setMessage("不存在可操作应用");
-			}
-			else if (!set.contains(appCode)) {
-				result.setCode(ResultCode.ERROR).setMessage("没有应用操作权限");
-			}
-			else {
-				user.setLastLoginIp(ip);
-				user.setLoginCount(user.getLoginCount() + 1);
-				user.setLastLoginTime(new Date());
-				dao.update(user);
-				result.setData(user);
-			}
+			user.setLastLoginIp(ip);
+			user.setLoginCount(user.getLoginCount() + 1);
+			user.setLastLoginTime(new Date());
+			dao.update(user);
+			result.setData(user);
 		}
 		return result;
 	}
@@ -103,5 +94,19 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> impleme
 		User user = get(id);
 		user.setPassword(PasswordProvider.encrypt(newPassword));
 		update(user);
+	}
+
+	@Override
+	public void save(User user, List<Integer> appIdList) {
+		save(user);
+		List<UserApp> list = new ArrayList<UserApp>();
+		UserApp bean = null;
+		for (Integer appId : appIdList) {
+			bean = new UserApp();
+			bean.setAppId(appId);
+			bean.setUserId(user.getId());
+			list.add(bean);
+		}
+		userAppService.allocate(user.getId(), appIdList.size() == 0 ? null : appIdList, list);
 	}
 }
