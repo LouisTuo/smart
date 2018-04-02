@@ -15,9 +15,9 @@
 	<properties>
 		<log.mail.host>smtp.163.com</log.mail.host>
 		<log.mail.port>25</log.mail.port>
-		<log.mail.username>consukj@163.com</log.mail.username>
-		<log.mail.password>gskj10086!</log.mail.password>
-		<log.mail.to>a466350665@qq.com</log.mail.to>
+		<log.mail.username>@163.com</log.mail.username>
+		<log.mail.password>xxxxs</log.mail.password>
+		<log.mail.to>958053629@qq.com</log.mail.to>
 	</properties>
 
 	<modules>
