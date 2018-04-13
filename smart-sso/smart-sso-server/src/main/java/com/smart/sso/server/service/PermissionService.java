@@ -15,11 +15,12 @@ public interface PermissionService extends Service<Permission, Integer> {
 
 	/**
 	 * 根据名称和应用ID查询
-	 * @param name 权限名称
 	 * @param appId 应用ID
+	 * @param roleId 角色ID
+	 * @param isEnable
 	 * @return
 	 */
-	public List<Permission> findByName(String name, Integer appId, Boolean isEnable);
+	public List<Permission> findByAppId(Integer appId, Integer roleId, Boolean isEnable);
 	
 	/**
 	 * 删除权限
@@ -37,9 +38,9 @@ public interface PermissionService extends Service<Permission, Integer> {
 	public void deleteByAppIds(List<Integer> idList);
 	
 	/**
-	 * 根据应用编码和管理员ID查权限
+	 * 根据应用编码和用户ID查权限
 	 * @param appCode 应用编码
-	 * @param userId 管理员ID
+	 * @param userId 用户ID
 	 * @return
 	 */
 	public List<RpcPermission> findListById(String appCode, Integer userId);

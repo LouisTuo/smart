@@ -53,18 +53,12 @@ public class LoginController extends BaseController{
 	public String login(
 			@ApiParam(value = "返回链接", required = true) @ValidateParam({ Validator.NOT_BLANK }) String backUrl,
 			HttpServletRequest request) {
-		String token = CookieUtils.getCookie(request, "token");
-		if (token == null) {
-			return goLoginPath(backUrl, request);
+		String token = CookieUtils.getCookie(request, TokenManager.TOKEN);
+		if (StringUtils.isNotBlank(token) && tokenManager.validate(token) != null) {
+			return "redirect:" + authBackUrl(backUrl, token);
 		}
 		else {
-			LoginUser loginUser = tokenManager.validate(token);
-			if (loginUser != null) {
-				return "redirect:" + authBackUrl(backUrl, token);
-			}
-			else {
-				return goLoginPath(backUrl, request);
-			}
+			return goLoginPath(backUrl, request);
 		}
 	}
 
@@ -88,7 +82,7 @@ public class LoginController extends BaseController{
 		else {
 			User user = (User) result.getData();
 			LoginUser loginUser = new LoginUser(user.getId(), user.getAccount());
-			String token = CookieUtils.getCookie(request, "token");
+			String token = CookieUtils.getCookie(request, TokenManager.TOKEN);
 			if (StringUtils.isBlank(token) || tokenManager.validate(token) == null) {// 没有登录的情况
 				token = createToken(loginUser);
 				addTokenInCookie(token, request, response);
@@ -128,7 +122,7 @@ public class LoginController extends BaseController{
 	
 	private void addTokenInCookie(String token, HttpServletRequest request, HttpServletResponse response) {
 		// Cookie添加token
-		Cookie cookie = new Cookie("token", token);
+		Cookie cookie = new Cookie(TokenManager.TOKEN, token);
 		cookie.setPath("/");
 		if ("https".equals(request.getScheme())) {
 			cookie.setSecure(true);

@@ -18,17 +18,14 @@ import com.smart.mvc.provider.PasswordProvider;
 import com.smart.mvc.service.mybatis.impl.ServiceImpl;
 import com.smart.sso.server.dao.UserDao;
 import com.smart.sso.server.model.User;
-import com.smart.sso.server.model.UserApp;
+import com.smart.sso.server.model.UserRole;
 import com.smart.sso.server.service.AppService;
-import com.smart.sso.server.service.UserAppService;
 import com.smart.sso.server.service.UserRoleService;
 import com.smart.sso.server.service.UserService;
 
 @Service("userService")
 public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> implements UserService {
 	
-	@Resource
-	private UserAppService userAppService;
 	@Resource
 	private UserRoleService userRoleService;
 	@Resource
@@ -49,7 +46,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> impleme
 			result.setCode(ResultCode.ERROR).setMessage("密码不正确");
 		}
 		else if (TrueFalseEnum.FALSE.getValue().equals(user.getIsEnable())) {
-			result.setCode(ResultCode.ERROR).setMessage("已被管理员禁用");
+			result.setCode(ResultCode.ERROR).setMessage("已被用户禁用");
 		}
 		else {
 			user.setLastLoginIp(ip);
@@ -62,7 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> impleme
 	}
 
 	public void enable(Boolean isEnable, List<Integer> idList) {
-		verifyRows(dao.enable(isEnable, idList), idList.size(), "管理员数据库更新失败");
+		verifyRows(dao.enable(isEnable, idList), idList.size(), "用户数据库更新失败");
 	}
 	
 	public void save(User t) {
@@ -70,11 +67,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> impleme
 	}
 
 	public void resetPassword(String password, List<Integer> idList) {
-		verifyRows(dao.resetPassword(password, idList), idList.size(), "管理员密码数据库重置失败");
+		verifyRows(dao.resetPassword(password, idList), idList.size(), "用户密码数据库重置失败");
 	}
 
-	public Pagination<User> findPaginationByAccount(String account, Integer appId, Pagination<User> p) {
-		dao.findPaginationByAccount(account, appId, p);
+	public Pagination<User> findPaginationByAccount(String account, Pagination<User> p) {
+		dao.findPaginationByAccount(account, p);
 		return p;
 	}
 	
@@ -84,9 +81,8 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> impleme
 	
 	@Transactional
 	public void deleteById(List<Integer> idList) {
-		userAppService.deleteByUserIds(idList);
-		userRoleService.deleteByUserIds(idList, null);
-		verifyRows(dao.deleteById(idList), idList.size(), "管理员数据库删除失败");
+		userRoleService.deleteByUserIds(idList);
+		verifyRows(dao.deleteById(idList), idList.size(), "用户数据库删除失败");
 	}
 
 	@Override
@@ -95,18 +91,19 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User, Integer> impleme
 		user.setPassword(PasswordProvider.encrypt(newPassword));
 		update(user);
 	}
+	
 
 	@Override
-	public void save(User user, List<Integer> appIdList) {
+	public void save(User user, List<Integer> roleIdList) {
 		save(user);
-		List<UserApp> list = new ArrayList<UserApp>();
-		UserApp bean = null;
-		for (Integer appId : appIdList) {
-			bean = new UserApp();
-			bean.setAppId(appId);
+		List<UserRole> userRoleList = new ArrayList<UserRole>();
+		UserRole bean;
+		for (Integer roleId : roleIdList) {
+			bean = new UserRole();
 			bean.setUserId(user.getId());
-			list.add(bean);
+			bean.setRoleId(roleId);
+			userRoleList.add(bean);
 		}
-		userAppService.allocate(user.getId(), appIdList.size() == 0 ? null : appIdList, list);
+		userRoleService.allocate(user.getId(), userRoleList);
 	}
 }

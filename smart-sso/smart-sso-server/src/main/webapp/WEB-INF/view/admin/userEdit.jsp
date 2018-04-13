@@ -2,12 +2,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:include page="../common/common.jsp">
-	<jsp:param name="title" value="管理员"/>
+	<jsp:param name="title" value="用户"/>
 </jsp:include>
 
 <div class="page-header">
 	<h1>
-		${empty user.id ? '添加' : '修改'}管理员
+		${empty user.id ? '添加' : '修改'}用户
 	</h1>
 </div>
 
@@ -54,17 +54,17 @@
 			</div>
 			
 			<div class="form-group">
-				<label class="col-sm-3 control-label no-padding-right">应用</label>
+				<label class="col-sm-3 control-label no-padding-right">角色</label>
 				
 				<div class="col-xs-12 col-sm-9">
 					<div class="clearfix help-validate">
-						<c:forEach var="item" items="${appList}">
+						<c:forEach var="item" items="${roleList}">
 							<label>
-								<input name="appId" value="${item.id}" type="checkbox" class="ace" ${item.isChecked ? 'checked="checked"' : ''}/>
+								<input name="roleId" value="${item.id}" type="checkbox" class="ace" ${item.isChecked ? 'checked="checked"' : ''}/>
 								<span class="lbl">&nbsp;&nbsp;${item.name}</span>
 							</label>
 						</c:forEach>
-						<input id="_appIds" type="hidden" name="appIds" value="">
+						<input id="_roleIds" type="hidden" name="roleIds" value="">
 					</div>
 				</div>
 			</div>
@@ -122,14 +122,14 @@
 			// 提交
 			$("#_submit").click(function(){
 				if($('#_editForm').validate()){
-					var appIds = "";
-					$("input[name='appId']:checked").each(function(i, d){
+					var roleIds = "";
+					$("input[name='roleId']:checked").each(function(i, d){
 						if(i > 0){
-							appIds += ",";
+							roleIds += ",";
 						}
-						appIds += $(this).val();
+						roleIds += $(this).val();
 					});
-					$("#_appIds").val(appIds);
+					$("#_roleIds").val(roleIds);
 					
 					var btn = $(this);
 					btn.button('loading');
