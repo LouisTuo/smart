@@ -53,6 +53,7 @@ public class LoginController extends BaseController{
 	public String login(
 			@ApiParam(value = "返回链接", required = true) @ValidateParam({ Validator.NOT_BLANK }) String backUrl,
 			HttpServletRequest request) {
+
 		String token = CookieUtils.getCookie(request, TokenManager.TOKEN);
 		if (StringUtils.isNotBlank(token) && tokenManager.validate(token) != null) {
 			return "redirect:" + authBackUrl(backUrl, token);
@@ -70,6 +71,7 @@ public class LoginController extends BaseController{
 			@ApiParam(value = "密码", required = true) @ValidateParam({ Validator.NOT_BLANK }) String password,
 			@ApiParam(value = "验证码", required = true) @ValidateParam({ Validator.NOT_BLANK }) String captcha,
 			HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+
 		if (!CaptchaHelper.validate(request, captcha)) {
 			request.setAttribute("errorMessage", "验证码不正确");
 			return goLoginPath(backUrl, request);

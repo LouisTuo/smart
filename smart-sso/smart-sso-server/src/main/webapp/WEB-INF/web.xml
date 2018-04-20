@@ -3,6 +3,7 @@
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0">
+	<display-name>hh</display-name>
 	<!-- Spring核心 -->
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -91,4 +92,9 @@
 		<load-on-startup>2</load-on-startup>
 		<async-supported>true</async-supported>
 	</servlet>
+	<!-- 配置错误访问界面 dev-->
+	<error-page>
+		<location>/smart-sso-server</location>
+	</error-page>
+
 </web-app>

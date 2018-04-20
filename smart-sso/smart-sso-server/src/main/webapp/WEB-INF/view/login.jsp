@@ -17,6 +17,7 @@
 		
 		<script type="text/javascript">
 			var url = window.location.href;
+			alert(url);
 			if(url.indexOf('${loginUrl}') == -1){
 				window.location.href = '${_path}${loginUrl}';
 			}
@@ -83,7 +84,7 @@
 												<fieldset>
 													<label class="block clearfix form-group">
 														<span class="block input-icon input-icon-right help-validate">
-															<input id="_account" name="account" type="text" class="form-control form-data" placeholder="登录名"
+															<input id="_account" name="account" type="text" class="form-control form-data" placeholder="用户名"
 																required="true" minlength = '4'/>
 															<i class="ace-icon fa fa-user"></i>
 														</span>
